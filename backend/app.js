@@ -1,14 +1,17 @@
-import express from "express";
-import  dotenv from "dotenv";
-import cors from "cors";
-const app = express();
+import dotenv from "dotenv";
 dotenv.config();
+import express from "express";
 
-app.use(cors())
+import cors from "cors";
+import authRouter from "./router/authRouter.js";
 
-//routes
-app.use("/api",require("./routes/authRoutes"));
+const app = express();
 
 
+app.use(cors());
+app.use(express.json()); // ✅ VERY IMPORTANT
+
+// routes
+app.use("/api/auth", authRouter); // ✅ only use this
 
 export default app;

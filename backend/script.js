@@ -1,7 +1,7 @@
 import chalk from "chalk";
-import express from "express"
 import ConnectDB from "./config/db.config.js";
-const app = express();
+import app from "./app.js";
+
 const PORT = process.env.PORT || 7000;``
 ConnectDB()
 .then(()=>{
