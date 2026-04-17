@@ -1,90 +1,74 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import axios from 'axios';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import axios from "axios";
 
-const Login = () => {
-  // state
-  const [credentials, setCredentials] = useState({
-    email: '',
-    password: ''
-  });
+const Login = ({ switchToRegister }) => {
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
 
-  // handle input change (FIXED)
   const handleChange = (e) => {
-    setCredentials({
-      ...credentials,
-      [e.target.name]: e.target.value
-    });
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
-  // login function
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await axios.post(
-        'http://localhost:8000/api/auth/login',
-        credentials
-      );
-
-      // save token
-      localStorage.setItem('token', response.data.token);
-
-      alert("Welcome back to Nexus!");
-
-      // redirect to dashboard
+      const res = await axios.post("http://localhost:8000/api/auth/login", credentials);
+      localStorage.setItem("token", res.data.token);
       window.location.href = "/dashboard";
-
-    } catch (error) {
-      console.log(error.response?.data);
-      alert(error.response?.data?.message || "Invalid Email or Password");
+    } catch (err) {
+      alert(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col gap-4 w-full"
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      transition={{ duration: 0.5 }}
+      className="bg-white p-4 rounded-lg shadow-[0_2px_4px_rgba(0,0,0,0.1),0_8px_16px_rgba(0,0,0,0.1)] w-[396px]"
     >
-      <form onSubmit={handleLogin} className="flex flex-col gap-4">
-
-        {/* EMAIL */}
-        <input
-          name="email"
-          type="email"
-          placeholder="Email address or mobile number"
-          required
-          onChange={handleChange}
-          className="p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-lg"
+      <form onSubmit={handleLogin} className="space-y-3">
+        <input 
+          name="email" 
+          type="text" 
+          placeholder="Email address or mobile number" 
+          required 
+          onChange={handleChange} 
+          className="w-full px-4 py-3.5 border border-[#dddfe2] rounded-[6px] text-[17px] focus:outline-none focus:border-[#1877f2] focus:shadow-[0_0_0_2px_#e7f3ff] placeholder-[#90949c]" 
+        />
+        <input 
+          name="password" 
+          type="password" 
+          placeholder="Password" 
+          required 
+          onChange={handleChange} 
+          className="w-full px-4 py-3.5 border border-[#dddfe2] rounded-[6px] text-[17px] focus:outline-none focus:border-[#1877f2] focus:shadow-[0_0_0_2px_#e7f3ff] placeholder-[#90949c]" 
         />
 
-        {/* PASSWORD */}
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          required
-          onChange={handleChange}
-          className="p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-lg"
-        />
-
-        {/* BUTTON */}
-        <button
+        <button 
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all text-xl shadow-md active:scale-[0.98]"
+          className="w-full bg-[#1877f2] hover:bg-[#166fe5] text-white text-[20px] font-bold py-3 rounded-[6px] transition-colors"
         >
-          Log In
+          Log in
         </button>
-
       </form>
 
-      {/* extra links */}
-      <a href="#" className="text-blue-600 text-sm text-center hover:underline">
-        Forgotten password?
-      </a>
+      <div className="mt-4 text-center">
+        <a href="#" className="text-[#1877f2] text-[14px] font-medium hover:underline">
+          Forgotten password?
+        </a>
+      </div>
 
-      <hr className="my-2 border-gray-200" />
+      <div className="my-5 border-t border-[#dadde1]"></div>
+
+      <div className="text-center pb-2">
+        <button 
+          onClick={switchToRegister}
+          className="bg-[#42b72a] hover:bg-[#36a420] text-white text-[17px] font-bold px-4 py-3 rounded-[6px] inline-block transition-colors"
+        >
+          Create new account
+        </button>
+      </div>
     </motion.div>
   );
 };

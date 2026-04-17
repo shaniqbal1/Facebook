@@ -1,13 +1,18 @@
-import { useState } from "react";
-import Login from "./pages/login.jsx";
-import Register from "./pages/register.jsx";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AuthPage from "./pages/authPage.jsx";
 
-export default function App() {
-  const [page, setPage] = useState("login"); // "login" | "register"
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Auth page (login + register) */}
+        <Route path="/" element={<AuthPage />} />
 
-  return page === "login" ? (
-    <Register onSwitchToLogin={() => setPage("login")} />
-  ) : (
-    <Login onSwitchToRegister={() => setPage("register")} />
+        {/* Example dashboard route (after login) */}
+        <Route path="/dashboard" element={<h1>Dashboard</h1>} />
+      </Routes>
+    </BrowserRouter>
   );
 }
+
+export default App;
