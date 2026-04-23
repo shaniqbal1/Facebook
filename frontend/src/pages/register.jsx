@@ -15,18 +15,23 @@ const Register = ({ switchToLogin }) => {
   const [successMsg, setSuccessMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
+  /* ─── INPUT HANDLER ─── */
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value
-    });
-  };
+    }));
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
     setError("");
     setSuccessMsg("");
-    setLoading(true);
+  };
+
+  /* ─── REGISTER ─── */
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    setError("");
+    setSuccessMsg("");
 
     if (
       !formData.name ||
@@ -36,16 +41,20 @@ const Register = ({ switchToLogin }) => {
       !formData.gender
     ) {
       setError("All fields are required");
-      setLoading(false);
       return;
     }
 
+    setLoading(true);
+
     try {
-      await axios.post("http://localhost:8000/api/auth/register", formData);
+      await axios.post(
+        "http://localhost:8000/api/auth/register",
+        formData
+      );
 
       setSuccessMsg("User registered successfully. Please verify your email.");
 
-      // ✅ RESET FORM HERE (IMPORTANT FIX)
+      // reset form
       setFormData({
         name: "",
         username: "",
@@ -55,62 +64,70 @@ const Register = ({ switchToLogin }) => {
       });
 
       setLoading(false);
-
     } catch (err) {
       setLoading(false);
       setError(err.response?.data?.message || "Something went wrong");
     }
   };
 
-  // auto hide success message
+  /* ─── AUTO HIDE SUCCESS ─── */
   useEffect(() => {
-    if (successMsg) {
-      const timer = setTimeout(() => setSuccessMsg(""), 5000);
-      return () => clearTimeout(timer);
-    }
+    if (!successMsg) return;
+
+    const timer = setTimeout(() => {
+      setSuccessMsg("");
+    }, 5000);
+
+    return () => clearTimeout(timer);
   }, [successMsg]);
 
   return (
     <div className="bg-white rounded-lg w-[396px] shadow-lg">
+
       <form onSubmit={handleRegister} className="p-4 space-y-3">
 
+        {/* success */}
         {successMsg && (
           <div className="bg-green-100 text-green-700 text-sm p-2 rounded">
             {successMsg}
           </div>
         )}
 
+        {/* error */}
         {error && (
           <div className="bg-red-100 text-red-600 text-sm p-2 rounded">
             {error}
           </div>
         )}
 
-        {/* IMPORTANT: ADD value={formData.x} */}
+        {/* name */}
         <input
           name="name"
           value={formData.name}
           placeholder="Full Name"
           onChange={handleChange}
-          className="w-full px-4 py-3 border rounded"
+          className="w-full px-4 py-3 border rounded outline-none"
         />
 
+        {/* username */}
         <input
           name="username"
           value={formData.username}
           placeholder="Username"
           onChange={handleChange}
-          className="w-full px-4 py-3 border rounded"
+          className="w-full px-4 py-3 border rounded outline-none"
         />
 
+        {/* email */}
         <input
           name="email"
           value={formData.email}
           placeholder="Email"
           onChange={handleChange}
-          className="w-full px-4 py-3 border rounded"
+          className="w-full px-4 py-3 border rounded outline-none"
         />
 
+        {/* password */}
         <div className="relative">
           <input
             name="password"
@@ -118,7 +135,7 @@ const Register = ({ switchToLogin }) => {
             type={showPw ? "text" : "password"}
             placeholder="Password"
             onChange={handleChange}
-            className="w-full px-4 py-3 border rounded"
+            className="w-full px-4 py-3 border rounded outline-none"
           />
 
           <button
@@ -130,45 +147,80 @@ const Register = ({ switchToLogin }) => {
           </button>
         </div>
 
-        <div className="flex gap-2">
-          <label>
+        {/* ─── FIXED GENDER UI (MODERN COLORS) ─── */}
+        <div className="grid grid-cols-3 gap-2 text-sm">
+
+          {/* Male */}
+          <label className={`cursor-pointer px-3 py-2 rounded-lg text-center border transition-all
+            ${
+              formData.gender === "male"
+                ? "bg-blue-600 text-white border-blue-400 shadow-md"
+                : "bg-white/5 text-gray-600 border-gray-200 hover:bg-gray-100"
+            }`}
+          >
             <input
               type="radio"
               name="gender"
               value="male"
               checked={formData.gender === "male"}
               onChange={handleChange}
-            /> Male
+              className="hidden"
+            />
+            Male
           </label>
 
-          <label>
+          {/* Female */}
+          <label className={`cursor-pointer px-3 py-2 rounded-lg text-center border transition-all
+            ${
+              formData.gender === "female"
+                ? "bg-pink-500 text-white border-pink-400 shadow-md"
+                : "bg-white/5 text-gray-600 border-gray-200 hover:bg-gray-100"
+            }`}
+          >
             <input
               type="radio"
               name="gender"
               value="female"
               checked={formData.gender === "female"}
               onChange={handleChange}
-            /> Female
+              className="hidden"
+            />
+            Female
           </label>
 
-          <label>
+          {/* Other */}
+          <label className={`cursor-pointer px-3 py-2 rounded-lg text-center border transition-all
+            ${
+              formData.gender === "other"
+                ? "bg-violet-500 text-white border-violet-400 shadow-md"
+                : "bg-white/5 text-gray-600 border-gray-200 hover:bg-gray-100"
+            }`}
+          >
             <input
               type="radio"
               name="gender"
               value="other"
               checked={formData.gender === "other"}
               onChange={handleChange}
-            /> Other
+              className="hidden"
+            />
+            Other
           </label>
+
         </div>
 
+        {/* submit */}
         <button className="w-full bg-blue-500 text-white py-3 rounded">
-          {loading ? "..." : "Sign Up"}
+          {loading ? "Loading..." : "Sign Up"}
         </button>
       </form>
 
+      {/* switch */}
       <div className="text-center py-4">
-        <button onClick={switchToLogin} className="text-blue-500 text-sm">
+        <button
+          onClick={switchToLogin}
+          className="text-blue-500 text-sm"
+        >
           Already have an account?
         </button>
       </div>

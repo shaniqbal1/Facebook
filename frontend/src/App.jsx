@@ -13,8 +13,8 @@ function App() {
 
         {/* Example dashboard route (after login) */}
         <Route path="/dashboard" element={<h1>Dashboard</h1>} />
-        <Route path="/login" element={<Login />} />  {/* ✅ MUST EXIST */}
-        <Route path="/Register" element={<Register />} />
+         <Route path="/Register" element={<Register />} />
+       <Route path="/login" element={<AuthPage />} />  {/* ✅ MUST EXIST */}
       </Routes>
     </BrowserRouter>
   );
