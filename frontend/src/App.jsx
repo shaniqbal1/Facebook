@@ -3,6 +3,7 @@ import AuthPage from "./pages/authPage.jsx";
 import Login from "./pages/login.jsx";
 import Register from "./pages/register.jsx";
 import Dashboard from "./pages/dashboard.jsx";
+import Profile from "./pages/userProfile.jsx";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
          <Route path="/Register" element={<Register />} />
        <Route path="/login" element={<AuthPage />} />  {/* ✅ MUST EXIST */}
        <Route path="/dashboard" element={<Dashboard />} /> {/* ✅ ADD THIS */}
+        <Route path="/dashboard" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );
