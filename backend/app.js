@@ -7,7 +7,7 @@ import cors from "cors";
 import authRouter from "./router/authRouter.js";
 import googleAuthRouter from "./router/googleauth-Router.js";
 import router from "./router/userProfile.js";
-
+import postRoutes from "./router/postRouter.js";
 
 const app = express();
 
@@ -27,6 +27,7 @@ app.use("/api/auth", googleAuthRouter);
 
 app.use("/api/user", router);
 
+app.use("/api/post", postRoutes);
 //Userprofile
 // app.use("/api/users", router);
 

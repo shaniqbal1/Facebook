@@ -2,23 +2,9 @@ import React from "react";
 import Navbar from "../component/navebar.jsx";
 import Sidebar from "../component/sideBar.jsx";
 
-/**
- * NexusLayout
- * Wraps any page with the Navbar + Sidebar.
- *
- * Usage:
- *   <NexusLayout user={currentUser}>
- *     <YourPageContent />
- *   </NexusLayout>
- *
- * Props:
- *   user   – { name, username, avatar? }  (passed to both Navbar & Sidebar)
- *   children – page content
- */
 const NexusLayout = ({ user, children }) => {
   return (
     <>
-      {/* Global styles */}
       <style>{`
         body {
           margin: 0;
@@ -29,7 +15,20 @@ const NexusLayout = ({ user, children }) => {
 
       <Navbar user={user} />
       <Sidebar user={user} />
-      <main className="ml-[240px] mt-[64px] min-h-screen px-8 py-6 box-border md:ml-0 md:px-4 md:py-4">
+
+      {/*
+        Desktop: ml-60 to clear the sidebar, mt-16 for navbar
+        Mobile:  ml-0 (no sidebar), mt-16 for navbar, pb-16 for bottom tab bar
+      */}
+      <main className="
+        mt-16
+        ml-0 md:ml-60
+        pb-16 md:pb-0
+        min-h-screen
+        px-4 sm:px-6 md:px-8
+        py-4 md:py-6
+        box-border
+      ">
         {children}
       </main>
     </>
