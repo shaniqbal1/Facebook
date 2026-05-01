@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { useUser } from "../context/userContext.jsx"; // ✅ FIX 1: import context
 
 const Profile = () => {
+  const { setUser: setContextUser } = useUser(); // ✅ FIX 2: grab context setter (renamed to avoid clash)
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -43,6 +46,7 @@ const Profile = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser(res.data.user);
+      setContextUser(res.data.user); // ✅ FIX 3: update context → Navbar + Sidebar re-render
       setFormData({
         name: res.data.user.name || "",
         bio: res.data.user.bio || "",
@@ -80,6 +84,7 @@ const Profile = () => {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
       });
       setUser(prev => ({ ...prev, profileImage: res.data.user.profileImage }));
+      setContextUser(prev => ({ ...prev, profileImage: res.data.user.profileImage })); // ✅ FIX 4: update context → avatar in Navbar + Sidebar updates instantly
     } catch (err) {
       setImgError(err.response?.status === 413 ? "Image too large. Max 1MB." : err.response?.data?.message || "Upload failed.");
       setTimeout(() => setImgError(""), 3000);
@@ -107,10 +112,6 @@ const Profile = () => {
       <div className="relative z-10 w-full max-w-2xl bg-[#13131a] border border-white/[0.07] rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl">
 
         {/* ── HEADER ── */}
-        {/*
-          Mobile:  stack avatar + name vertically, buttons below
-          Desktop: row layout with avatar, name, buttons side by side
-        */}
         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-start gap-4 sm:gap-6">
 
           {/* Avatar + name row on mobile */}
@@ -156,7 +157,7 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Edit / Save / Cancel — full width on mobile, auto on desktop */}
+          {/* Edit / Save / Cancel */}
           <div className="flex flex-col gap-2 sm:ml-auto w-full sm:w-auto">
             {!editing ? (
               <button
@@ -213,7 +214,7 @@ const Profile = () => {
         {/* Divider */}
         <div className="my-5 sm:my-6 border-t border-white/[0.07]" />
 
-        {/* ── DETAILS GRID ── single col on mobile, 2 col on sm+ ── */}
+        {/* ── DETAILS GRID ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
           {/* Date of Birth */}

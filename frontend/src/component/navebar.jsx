@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/userContext.jsx";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 const BoltIcon = () => (
@@ -34,7 +35,9 @@ const ChevronDown = () => (
   </svg>
 );
 
-const Navbar = ({ user = { name: "...", username: "...", avatar: null } }) => {
+const Navbar = () => {
+  const { user } = useUser();
+
   const navigate = useNavigate();
   const [searchVal, setSearchVal] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -50,7 +53,6 @@ const Navbar = ({ user = { name: "...", username: "...", avatar: null } }) => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/85 backdrop-blur-lg border-b border-purple-500/20">
 
-      {/* ── Main bar ── */}
       <div className="h-16 flex items-center px-4 md:px-6 gap-3">
 
         {/* Logo */}
@@ -61,7 +63,7 @@ const Navbar = ({ user = { name: "...", username: "...", avatar: null } }) => {
           <span className="text-white text-lg font-extrabold tracking-tight">Nexus</span>
         </div>
 
-        {/* Search bar — desktop only */}
+        {/* Search bar */}
         <div className="relative flex-1 max-w-lg mx-auto hidden md:block">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
             <SearchIcon />
@@ -74,13 +76,11 @@ const Navbar = ({ user = { name: "...", username: "...", avatar: null } }) => {
           />
         </div>
 
-        {/* Push right actions to end on mobile */}
         <div className="flex-1 md:hidden" />
 
-        {/* Right actions */}
         <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
 
-          {/* Mobile search toggle */}
+          {/* Mobile search */}
           <button
             className="md:hidden w-9 h-9 rounded-xl border border-white/10 text-gray-400 flex items-center justify-center hover:bg-purple-900/40 hover:text-purple-400 transition-all"
             onClick={() => setMobileSearchOpen(o => !o)}
@@ -101,7 +101,7 @@ const Navbar = ({ user = { name: "...", username: "...", avatar: null } }) => {
             )}
           </div>
 
-          {/* Messages — hidden on xs, shown sm+ */}
+          {/* Messages */}
           <div
             className="hidden sm:flex w-9 h-9 rounded-xl border border-white/10 text-gray-400 items-center justify-center cursor-pointer hover:bg-purple-900/40 hover:text-purple-400 transition-all"
             onClick={() => navigate("/messages")}
@@ -109,7 +109,7 @@ const Navbar = ({ user = { name: "...", username: "...", avatar: null } }) => {
             <MessageIcon />
           </div>
 
-          {/* Create Post — icon-only on mobile */}
+          {/* Create */}
           <button
             className="flex items-center gap-1.5 h-9 px-2 md:px-4 rounded-xl bg-gradient-to-br from-purple-600 to-purple-800 text-white font-semibold text-sm border-none cursor-pointer hover:opacity-90 transition-all shadow-lg"
             onClick={() => navigate("/create")}
@@ -118,20 +118,23 @@ const Navbar = ({ user = { name: "...", username: "...", avatar: null } }) => {
             <span className="hidden md:inline">Create Post</span>
           </button>
 
-          {/* Avatar / dropdown */}
+          {/* Avatar */}
           <div className="relative">
             <div
               className={`flex items-center gap-1.5 px-2 py-1.5 rounded-xl border border-white/10 cursor-pointer transition-all hover:bg-purple-900/40 ${dropdownOpen ? "bg-purple-900/40" : ""}`}
               onClick={() => setDropdownOpen(o => !o)}
             >
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white text-sm font-semibold overflow-hidden flex-shrink-0">
-                {user.avatar
-                  ? <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                  : (user.name && user.name !== "..." ? user.name[0].toUpperCase() : "?")}
+                {/* ✅ FIXED: was user?.avatar, now user?.profileImage */}
+                {user?.profileImage
+                  ? <img src={user.profileImage} alt={user?.name} className="w-full h-full object-cover" />
+                  : (user?.name ? user.name[0].toUpperCase() : "?")}
               </div>
+
               <span className="hidden sm:inline text-sm font-semibold text-gray-300">
-                {user.name && user.name !== "..." ? user.name.split(" ")[0] : "..."}
+                {user?.name ? user.name.split(" ")[0] : "..."}
               </span>
+
               <span className="text-gray-400 hidden sm:inline"><ChevronDown /></span>
             </div>
 
@@ -141,15 +144,19 @@ const Navbar = ({ user = { name: "...", username: "...", avatar: null } }) => {
                   className="flex items-center gap-2 px-3 py-2 text-gray-400 hover:bg-purple-900/60 hover:text-white cursor-pointer rounded-lg transition-all text-sm">
                   👤 Profile
                 </div>
+
                 <div onClick={() => { navigate("/bookmarks"); setDropdownOpen(false); }}
                   className="flex items-center gap-2 px-3 py-2 text-gray-400 hover:bg-purple-900/60 hover:text-white cursor-pointer rounded-lg transition-all text-sm">
                   🔖 Bookmarks
                 </div>
+
                 <div onClick={() => { navigate("/settings"); setDropdownOpen(false); }}
                   className="flex items-center gap-2 px-3 py-2 text-gray-400 hover:bg-purple-900/60 hover:text-white cursor-pointer rounded-lg transition-all text-sm">
                   ⚙️ Settings
                 </div>
+
                 <div className="h-px bg-white/10 my-1.5" />
+
                 <div onClick={handleLogout}
                   className="flex items-center gap-2 px-3 py-2 text-red-400 hover:bg-red-900/40 hover:text-red-300 cursor-pointer rounded-lg transition-all text-sm">
                   🚪 Log out
@@ -160,7 +167,7 @@ const Navbar = ({ user = { name: "...", username: "...", avatar: null } }) => {
         </div>
       </div>
 
-      {/* ── Mobile search dropdown ── */}
+      {/* Mobile search dropdown */}
       {mobileSearchOpen && (
         <div className="md:hidden px-4 pb-3 border-t border-white/5 pt-2">
           <div className="relative">
@@ -181,4 +188,4 @@ const Navbar = ({ user = { name: "...", username: "...", avatar: null } }) => {
   );
 };
 
-export default Navbar; 
+export default Navbar;

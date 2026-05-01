@@ -1,6 +1,6 @@
-
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useUser } from "../context/userContext.jsx";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 const HomeIcon = ({ filled }) => (
@@ -49,7 +49,7 @@ const ProfileIcon = ({ filled }) => (
 const SettingsIcon = ({ filled }) => (
   <svg viewBox="0 0 24 24" width="20" height="20" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
     <circle cx="12" cy="12" r="3" />
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06..." />
   </svg>
 );
 const PlusIcon = () => (
@@ -60,23 +60,22 @@ const PlusIcon = () => (
 
 // ─── Nav config ───────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
-  { label: "Home",          path: "/dashboard",    Icon: HomeIcon },
-  { label: "Reels",         path: "/reels",         Icon: ReelsIcon },
-  { label: "Explore",       path: "/explore",       Icon: ExploreIcon },
-  { label: "Notifications", path: "/notifications", Icon: BellIcon,    badge: 3 },
-  { label: "Messages",      path: "/messages",      Icon: MessageIcon },
-  { label: "Bookmarks",     path: "/bookmarks",     Icon: BookmarkIcon },
-  { label: "Profile",       path: "/profile",       Icon: ProfileIcon },
-  { label: "Settings",      path: "/settings",      Icon: SettingsIcon },
+  { label: "Home", path: "/dashboard", Icon: HomeIcon },
+  { label: "Reels", path: "/reels", Icon: ReelsIcon },
+  { label: "Explore", path: "/explore", Icon: ExploreIcon },
+  { label: "Notifications", path: "/notifications", Icon: BellIcon, badge: 3 },
+  { label: "Messages", path: "/messages", Icon: MessageIcon },
+  { label: "Bookmarks", path: "/bookmarks", Icon: BookmarkIcon },
+  { label: "Profile", path: "/profile", Icon: ProfileIcon },
+  { label: "Settings", path: "/settings", Icon: SettingsIcon },
 ];
 
-// Bottom tab items (most important 5 for mobile)
 const BOTTOM_TABS = [
-  { label: "Home",    path: "/dashboard",    Icon: HomeIcon },
-  { label: "Explore", path: "/explore",      Icon: ExploreIcon },
-  { label: "Reels",   path: "/reels",        Icon: ReelsIcon },
-  { label: "Notifs",  path: "/notifications",Icon: BellIcon, badge: 3 },
-  { label: "Profile", path: "/profile",      Icon: ProfileIcon },
+  { label: "Home", path: "/dashboard", Icon: HomeIcon },
+  { label: "Explore", path: "/explore", Icon: ExploreIcon },
+  { label: "Reels", path: "/reels", Icon: ReelsIcon },
+  { label: "Notifs", path: "/notifications", Icon: BellIcon, badge: 3 },
+  { label: "Profile", path: "/profile", Icon: ProfileIcon },
 ];
 
 const NavItem = ({ label, path, Icon, badge, isActive, onClick }) => (
@@ -97,36 +96,29 @@ const NavItem = ({ label, path, Icon, badge, isActive, onClick }) => (
   </div>
 );
 
-const Sidebar = ({ user = { name: "...", username: "...", avatar: null } }) => {
+const Sidebar = () => {
+  const { user } = useUser();
+
   const navigate = useNavigate();
   const location = useLocation();
 
   return (
     <>
-      {/* ── Desktop sidebar (hidden on mobile) ── */}
       <aside className="hidden md:flex fixed top-16 left-0 bottom-0 w-60 bg-[#0d0b18] border-r border-purple-500/15 p-4 flex-col overflow-y-auto z-40">
         <nav className="flex flex-col gap-1.5 flex-1">
-          {NAV_ITEMS.slice(0, 3).map(({ label, path, Icon, badge }) => (
-            <NavItem key={path} label={label} path={path} Icon={Icon} badge={badge}
-              isActive={location.pathname === path} onClick={() => navigate(path)} />
-          ))}
-
-          <div className="my-3 border-t border-white/10" />
-
-          {NAV_ITEMS.slice(3, 6).map(({ label, path, Icon, badge }) => (
-            <NavItem key={path} label={label} path={path} Icon={Icon} badge={badge}
-              isActive={location.pathname === path} onClick={() => navigate(path)} />
-          ))}
-
-          <div className="my-3 border-t border-white/10" />
-
-          {NAV_ITEMS.slice(6).map(({ label, path, Icon, badge }) => (
-            <NavItem key={path} label={label} path={path} Icon={Icon} badge={badge}
-              isActive={location.pathname === path} onClick={() => navigate(path)} />
+          {NAV_ITEMS.map(({ label, path, Icon, badge }) => (
+            <NavItem
+              key={path}
+              label={label}
+              path={path}
+              Icon={Icon}
+              badge={badge}
+              isActive={location.pathname === path}
+              onClick={() => navigate(path)}
+            />
           ))}
         </nav>
 
-        {/* Create Post button */}
         <button
           className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold text-sm hover:opacity-90 transition-all mt-4 w-full"
           onClick={() => navigate("/create")}
@@ -135,25 +127,32 @@ const Sidebar = ({ user = { name: "...", username: "...", avatar: null } }) => {
           Create Post
         </button>
 
-        {/* User card */}
+        {/* USER CARD */}
         <div
           className="flex items-center gap-3 p-3 rounded-xl bg-purple-900/20 mt-4 cursor-pointer hover:bg-purple-900/35 transition-all"
           onClick={() => navigate("/profile")}
         >
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 overflow-hidden">
-            {user.avatar
-              ? <img src={user.avatar} alt={user.name} className="w-full h-full object-cover rounded-lg" />
-              : (user.name && user.name !== "..." ? user.name[0].toUpperCase() : "?")}
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
+            {/* ✅ FIXED: was user?.avatar, now user?.profileImage */}
+            {user?.profileImage
+              ? <img src={user.profileImage} alt={user?.name} className="w-full h-full object-cover rounded-lg" />
+              : (user?.name ? user.name[0].toUpperCase() : "?")}
           </div>
+
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold text-white truncate">{user.name}</div>
-            <div className="text-xs text-gray-400 truncate">@{user.username}</div>
+            <div className="text-sm font-semibold text-white truncate">
+              {user?.name || "..."}
+            </div>
+            <div className="text-xs text-gray-400 truncate">
+              @{user?.username || "..."}
+            </div>
           </div>
+
           <span className="text-gray-500 text-lg leading-none">···</span>
         </div>
       </aside>
 
-      {/* ── Mobile bottom tab bar (visible only on mobile) ── */}
+      {/* MOBILE */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-xl border-t border-purple-500/20 flex items-center justify-around px-2 h-16">
         {BOTTOM_TABS.map(({ label, path, Icon, badge }) => {
           const isActive = location.pathname === path;

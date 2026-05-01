@@ -2,7 +2,7 @@ import React from "react";
 import Navbar from "../component/navebar.jsx";
 import Sidebar from "../component/sideBar.jsx";
 
-const NexusLayout = ({ user, children }) => {
+const NexusLayout = ({ children }) => {
   return (
     <>
       <style>{`
@@ -13,14 +13,13 @@ const NexusLayout = ({ user, children }) => {
         }
       `}</style>
 
-      <Navbar user={user} />
-      <Sidebar user={user} />
+      {/* ✅ No props needed (using context inside components) */}
+      <Navbar />
+      <Sidebar />
 
-      {/*
-        Desktop: ml-60 to clear the sidebar, mt-16 for navbar
-        Mobile:  ml-0 (no sidebar), mt-16 for navbar, pb-16 for bottom tab bar
-      */}
-      <main className="
+      {/* Layout */}
+      <main
+        className="
         mt-16
         ml-0 md:ml-60
         pb-16 md:pb-0
@@ -28,7 +27,8 @@ const NexusLayout = ({ user, children }) => {
         px-4 sm:px-6 md:px-8
         py-4 md:py-6
         box-border
-      ">
+      "
+      >
         {children}
       </main>
     </>
