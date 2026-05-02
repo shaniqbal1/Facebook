@@ -1,35 +1,38 @@
 import dotenv from "dotenv";
 dotenv.config();
-import passport from "./config/passport.js"
+import passport from "./config/passport.js";
 import express from "express";
-// import router from "./router/userprofileRoute.js";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+
 import authRouter from "./router/authRouter.js";
 import googleAuthRouter from "./router/googleauth-Router.js";
 import router from "./router/userProfile.js";
 import postRoutes from "./router/postRouter.js";
 
+// ✅ Needed to resolve __dirname in ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 
 app.use(cors({
   origin: "http://localhost:5173",
-  credentials: true
+  credentials: true,
 }));
 
-app.use(express.json()); // ✅ VERY IMPORTANT
-app.use("/uploads", express.static("uploads"));
+app.use(express.json());
+
+// ✅ FIX: Use path.join so /uploads is served correctly on both Windows & Linux
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(passport.initialize());
-// routes
-app.use("/api/auth", authRouter); // ✅ only use this
-// GOOGLE ROUTES
+
+// Routes
+app.use("/api/auth", authRouter);
 app.use("/api/auth", googleAuthRouter);
-
 app.use("/api/user", router);
-
 app.use("/api/post", postRoutes);
-//Userprofile
-// app.use("/api/users", router);
-
 
 export default app;
