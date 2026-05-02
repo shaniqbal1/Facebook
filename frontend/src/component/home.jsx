@@ -48,7 +48,7 @@ const timeAgo = (dateStr) => {
   return `${Math.floor(diff / 86400)}d ago`;
 };
 
-const API = "http://localhost:8000";
+const API = "http://localhost:7000";
 
 // ─── PostCard ─────────────────────────────────────────────────────────────────
 const PostCard = ({ post }) => {
@@ -63,11 +63,14 @@ const PostCard = ({ post }) => {
 
   const avatar = post.user?.profileImage;
   const username = post.user?.username ?? "unknown";
-  const initials = username[0]?.toUpperCase() ?? "?";
+  // ✅ FIX: use editable name field, fallback to username if not set
+  const displayName = post.user?.name || username;
+  const initials = displayName[0]?.toUpperCase() ?? "?";
 
-  // Build full image URL — backend serves from /uploads
   const imageUrl = post.image
-    ? (post.image.startsWith("http") ? post.image : `${API}/${post.image.replace(/\\/g, "/")}`)
+    ? (post.image.startsWith("http")
+        ? post.image
+        : `${API}/${post.image.replace(/\\/g, "/")}`)
     : null;
 
   return (
@@ -87,13 +90,20 @@ const PostCard = ({ post }) => {
           color: "#fff", fontWeight: 600, fontSize: 15,
         }}>
           {avatar
-            ? <img src={avatar.startsWith("http") ? avatar : `${API}/${avatar}`}
-                alt={username} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ? <img
+                src={avatar.startsWith("http") ? avatar : `${API}/${avatar.replace(/\\/g, "/")}`}
+                alt={displayName}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
             : initials}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ color: "#f3f4f6", fontWeight: 600, fontSize: 14 }}>@{username}</div>
-          <div style={{ color: "#6b7280", fontSize: 12 }}>{timeAgo(post.createdAt)}</div>
+          {/* ✅ FIX: show editable name (bold, white) on top */}
+          <div style={{ color: "#f3f4f6", fontWeight: 600, fontSize: 14 }}>{displayName}</div>
+          {/* ✅ show @username + time below */}
+          <div style={{ color: "#6b7280", fontSize: 12 }}>
+            @{username} · {timeAgo(post.createdAt)}
+          </div>
         </div>
         <button style={{ background: "none", border: "none", color: "#6b7280", cursor: "pointer", padding: 4 }}>
           <MoreIcon />
@@ -150,7 +160,7 @@ const PostCard = ({ post }) => {
       {/* Caption */}
       {post.caption && (
         <div style={{ padding: "4px 16px 14px", color: "#d1d5db", fontSize: 14, lineHeight: 1.5 }}>
-          <span style={{ color: "#c4b5fd", fontWeight: 600, marginRight: 6 }}>@{username}</span>
+          <span style={{ color: "#c4b5fd", fontWeight: 600, marginRight: 6 }}>{displayName}</span>
           {post.caption}
         </div>
       )}
