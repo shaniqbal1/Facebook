@@ -48,7 +48,8 @@ const timeAgo = (dateStr) => {
   return `${Math.floor(diff / 86400)}d ago`;
 };
 
-const API = "http://localhost:7000";
+// ✅ ONE correct API URL used everywhere
+const API = "http://localhost:8000";
 
 // ─── PostCard ─────────────────────────────────────────────────────────────────
 const PostCard = ({ post }) => {
@@ -63,15 +64,11 @@ const PostCard = ({ post }) => {
 
   const avatar = post.user?.profileImage;
   const username = post.user?.username ?? "unknown";
-  // ✅ FIX: use editable name field, fallback to username if not set
   const displayName = post.user?.name || username;
   const initials = displayName[0]?.toUpperCase() ?? "?";
 
-  const imageUrl = post.image
-    ? (post.image.startsWith("http")
-        ? post.image
-        : `${API}/${post.image.replace(/\\/g, "/")}`)
-    : null;
+  // ✅ Cloudinary always returns a full https:// URL — use it directly
+  const imageUrl = post.image || null;
 
   return (
     <article style={{
@@ -91,16 +88,14 @@ const PostCard = ({ post }) => {
         }}>
           {avatar
             ? <img
-                src={avatar.startsWith("http") ? avatar : `${API}/${avatar.replace(/\\/g, "/")}`}
+                src={avatar} // ✅ Cloudinary URL directly
                 alt={displayName}
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             : initials}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          {/* ✅ FIX: show editable name (bold, white) on top */}
           <div style={{ color: "#f3f4f6", fontWeight: 600, fontSize: 14 }}>{displayName}</div>
-          {/* ✅ show @username + time below */}
           <div style={{ color: "#6b7280", fontSize: 12 }}>
             @{username} · {timeAgo(post.createdAt)}
           </div>
@@ -168,7 +163,7 @@ const PostCard = ({ post }) => {
   );
 };
 
-// ─── PostSkeleton (loading placeholder) ──────────────────────────────────────
+// ─── PostSkeleton ─────────────────────────────────────────────────────────────
 const Skeleton = ({ style }) => (
   <div style={{
     background: "rgba(168,85,247,0.08)",
@@ -243,8 +238,7 @@ const Home = ({ user }) => {
 
         {!loading && !error && posts.length === 0 && (
           <div style={{
-            textAlign: "center", padding: "60px 20px",
-            color: "#6b7280",
+            textAlign: "center", padding: "60px 20px", color: "#6b7280",
           }}>
             <div style={{ color: "#4b5563", marginBottom: 12 }}><ImageIcon /></div>
             <p style={{ fontSize: 16, fontWeight: 600, color: "#9ca3af", margin: "0 0 6px" }}>No posts yet</p>

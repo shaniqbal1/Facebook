@@ -16,17 +16,14 @@ router.post(
         return res.status(400).json({ message: "Image is required" });
       }
 
-      // Normalize Windows backslashes → forward slashes
-      const imagePath = req.file.path.replace(/\\/g, "/");
-
       const post = await Post.create({
         user: req.user.id,
-        image: imagePath,
+        image: req.file.path,
+        imageId: req.file.filename,
         caption: req.body.caption,
       });
 
-      // ✅ FIX: populate name too (not just username)
-      const populated = await post.populate("user", "name username profileImage");
+      const populated = await post.populate("user", "name username profileImage _id");
 
       res.status(201).json(populated);
     } catch (err) {
@@ -39,10 +36,31 @@ router.post(
 router.get("/all", async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate("user", "name username profileImage") // ✅ FIX: added name
+      .populate("user", "name username profileImage _id") // ✅ _id added
       .sort({ createdAt: -1 });
 
     res.json(posts);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// DELETE POST
+router.delete("/:id", authMiddleware, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Only the owner can delete
+    if (post.user.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    await post.deleteOne();
+    res.json({ message: "Post deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

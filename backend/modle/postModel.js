@@ -6,7 +6,8 @@ const postSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    image: String,
+    image: String,    // ✅ Cloudinary URL
+    imageId: String,  // ✅ Cloudinary public_id (needed to delete image later)
     caption: String,
   },
   { timestamps: true }
