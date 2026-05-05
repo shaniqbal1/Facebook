@@ -1,20 +1,28 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { UserProvider } from "./context/userContext.jsx"; // ✅ ADD THIS
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { UserProvider } from "./context/userContext.jsx";
 
 import AuthPage from "./pages/authPage.jsx";
 import Register from "./pages/register.jsx";
-import Dashboard from "./pages/dashboard.jsx";
+import Dashboard from "./component/dashboard.jsx";
 import Profile from "./pages/userProfile.jsx";
 import CreatePost from "./component/createpost.jsx";
 import NexusLayout from "./component/nexusLayout.jsx";
+import Notifications from "./component/dashboard/notification.jsx"; // ✅ ADD THIS
 
+// Optional: protect routes if user not logged in
 const ProtectedLayout = ({ children }) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+
   return <NexusLayout>{children}</NexusLayout>;
 };
 
 function App() {
   return (
-    <UserProvider> {/* ✅ WRAP EVERYTHING */}
+    <UserProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<AuthPage />} />
@@ -35,6 +43,15 @@ function App() {
             path="/create"
             element={<ProtectedLayout><CreatePost /></ProtectedLayout>}
           />
+
+          {/* ✅ FIXED: notifications route */}
+          <Route
+            path="/notifications"
+            element={<ProtectedLayout><Notifications /></ProtectedLayout>}
+          />
+
+          {/* ✅ Optional fallback */}
+          <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>

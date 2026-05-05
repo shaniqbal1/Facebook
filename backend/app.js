@@ -10,8 +10,8 @@ import authRouter from "./router/authRouter.js";
 import googleAuthRouter from "./router/googleauth-Router.js";
 import router from "./router/userProfile.js";
 import postRoutes from "./router/postRouter.js";
+import notificationRoutes from "./router/notificationRouter.js"; // ✅ fixed import
 
-// ✅ Needed to resolve __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -23,10 +23,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
-
-// ✅ FIX: Use path.join so /uploads is served correctly on both Windows & Linux
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
 app.use(passport.initialize());
 
 // Routes
@@ -34,5 +31,6 @@ app.use("/api/auth", authRouter);
 app.use("/api/auth", googleAuthRouter);
 app.use("/api/user", router);
 app.use("/api/post", postRoutes);
+app.use("/api/notifications", notificationRoutes); // ✅ now points to correct router
 
 export default app;
