@@ -49,7 +49,7 @@ const ProfileIcon = ({ filled }) => (
 const SettingsIcon = ({ filled }) => (
   <svg viewBox="0 0 24 24" width="20" height="20" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
     <circle cx="12" cy="12" r="3" />
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06..." />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
   </svg>
 );
 const PlusIcon = () => (
@@ -58,65 +58,60 @@ const PlusIcon = () => (
   </svg>
 );
 
-// ─── Nav config ───────────────────────────────────────────────────────────────
-const NAV_ITEMS = [
-  { label: "Home", path: "/dashboard", Icon: HomeIcon },
-  { label: "Reels", path: "/reels", Icon: ReelsIcon },
-  { label: "Explore", path: "/explore", Icon: ExploreIcon },
-  { label: "Notifications", path: "/notifications", Icon: BellIcon, badge: 3 },
-  { label: "Messages", path: "/messages", Icon: MessageIcon },
-  { label: "Bookmarks", path: "/bookmarks", Icon: BookmarkIcon },
-  { label: "Profile", path: "/profile", Icon: ProfileIcon },
-  { label: "Settings", path: "/settings", Icon: SettingsIcon },
-];
-
-const BOTTOM_TABS = [
-  { label: "Home", path: "/dashboard", Icon: HomeIcon },
-  { label: "Explore", path: "/explore", Icon: ExploreIcon },
-  { label: "Reels", path: "/reels", Icon: ReelsIcon },
-  { label: "Notifs", path: "/notifications", Icon: BellIcon, badge: 3 },
-  { label: "Profile", path: "/profile", Icon: ProfileIcon },
-];
-
-const NavItem = ({ label, path, Icon, badge, isActive, onClick }) => (
-  <div
-    onClick={onClick}
-    className={`flex items-center gap-3 p-2 rounded-xl cursor-pointer text-sm font-medium transition-all duration-200
-      ${isActive
-        ? "bg-purple-600/30 text-purple-300 border border-purple-500/25"
-        : "text-gray-400 hover:bg-purple-800/50 hover:text-purple-200"}`}
-  >
-    <span><Icon filled={isActive} /></span>
-    <span className="flex-1">{label}</span>
-    {badge && (
-      <span className="bg-purple-700 text-white text-xs font-bold min-w-[20px] h-5 rounded-full flex items-center justify-center px-1">
-        {badge}
-      </span>
-    )}
-  </div>
-);
-
 const Sidebar = () => {
-  const { user } = useUser();
-
+  const { user, unreadCount, markNotificationsRead } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const handleNotifClick = () => {
+    markNotificationsRead();
+    navigate("/notifications");
+  };
+
+  const NAV_ITEMS = [
+    { label: "Home", path: "/dashboard", Icon: HomeIcon },
+    { label: "Reels", path: "/reels", Icon: ReelsIcon },
+    { label: "Explore", path: "/explore", Icon: ExploreIcon },
+    { label: "Notifications", path: "/notifications", Icon: BellIcon, isNotif: true },
+    { label: "Messages", path: "/messages", Icon: MessageIcon },
+    { label: "Bookmarks", path: "/bookmarks", Icon: BookmarkIcon },
+    { label: "Profile", path: "/profile", Icon: ProfileIcon },
+    { label: "Settings", path: "/settings", Icon: SettingsIcon },
+  ];
+
+  const BOTTOM_TABS = [
+    { label: "Home", path: "/dashboard", Icon: HomeIcon },
+    { label: "Explore", path: "/explore", Icon: ExploreIcon },
+    { label: "Reels", path: "/reels", Icon: ReelsIcon },
+    { label: "Notifs", path: "/notifications", Icon: BellIcon, isNotif: true },
+    { label: "Profile", path: "/profile", Icon: ProfileIcon },
+  ];
 
   return (
     <>
       <aside className="hidden md:flex fixed top-16 left-0 bottom-0 w-60 bg-[#0d0b18] border-r border-purple-500/15 p-4 flex-col overflow-y-auto z-40">
         <nav className="flex flex-col gap-1.5 flex-1">
-          {NAV_ITEMS.map(({ label, path, Icon, badge }) => (
-            <NavItem
-              key={path}
-              label={label}
-              path={path}
-              Icon={Icon}
-              badge={badge}
-              isActive={location.pathname === path}
-              onClick={() => navigate(path)}
-            />
-          ))}
+          {NAV_ITEMS.map(({ label, path, Icon, isNotif }) => {
+            const isActive = location.pathname === path;
+            return (
+              <div
+                key={path}
+                onClick={isNotif ? handleNotifClick : () => navigate(path)}
+                className={`flex items-center gap-3 p-2 rounded-xl cursor-pointer text-sm font-medium transition-all duration-200
+                  ${isActive
+                    ? "bg-purple-600/30 text-purple-300 border border-purple-500/25"
+                    : "text-gray-400 hover:bg-purple-800/50 hover:text-purple-200"}`}
+              >
+                <span className="relative">
+                  <Icon filled={isActive} />
+                  {isNotif && unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500" />
+                  )}
+                </span>
+                <span className="flex-1">{label}</span>
+              </div>
+            );
+          })}
         </nav>
 
         <button
@@ -133,7 +128,6 @@ const Sidebar = () => {
           onClick={() => navigate("/profile")}
         >
           <div className="w-9 h-9 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
-            {/* ✅ FIXED: was user?.avatar, now user?.profileImage */}
             {user?.profileImage
               ? <img src={user.profileImage} alt={user?.name} className="w-full h-full object-cover rounded-lg" />
               : (user?.name ? user.name[0].toUpperCase() : "?")}
@@ -152,24 +146,24 @@ const Sidebar = () => {
         </div>
       </aside>
 
-      {/* MOBILE */}
+      {/* MOBILE BOTTOM NAV */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-xl border-t border-purple-500/20 flex items-center justify-around px-2 h-16">
-        {BOTTOM_TABS.map(({ label, path, Icon, badge }) => {
+        {BOTTOM_TABS.map(({ label, path, Icon, isNotif }) => {
           const isActive = location.pathname === path;
           return (
             <button
               key={path}
-              onClick={() => navigate(path)}
+              onClick={isNotif ? handleNotifClick : () => navigate(path)}
               className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 rounded-xl transition-all relative
                 ${isActive ? "text-purple-400" : "text-gray-500 hover:text-gray-300"}`}
             >
-              <Icon filled={isActive} />
+              <span className="relative">
+                <Icon filled={isActive} />
+                {isNotif && unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500" />
+                )}
+              </span>
               <span className="text-[10px] font-medium">{label}</span>
-              {badge && (
-                <span className="absolute top-1 right-[calc(50%-16px)] w-4 h-4 rounded-full bg-purple-600 text-white text-[9px] font-bold flex items-center justify-center">
-                  {badge}
-                </span>
-              )}
             </button>
           );
         })}

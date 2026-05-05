@@ -1,6 +1,7 @@
 import cloudinary from "../config/cloudinary.js";
 import User from "../modle/userModle.js";
 
+
 export const updateProfile = async (req, res) => {
   try {
     const { name, bio, dateOfBirth } = req.body;
@@ -14,25 +15,14 @@ export const updateProfile = async (req, res) => {
       });
     }
 
-    // TEXT FIELDS
+    // ✅ Update text fields
     if (name !== undefined) user.name = name;
     if (bio !== undefined) user.bio = bio;
     if (dateOfBirth !== undefined) user.dateOfBirth = dateOfBirth;
 
-    // IMAGE UPLOAD
+    // ✅ Image already uploaded by CloudinaryStorage
     if (req.file) {
-      const result = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "profile_images" },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        );
-        stream.end(req.file.buffer);
-      });
-
-      user.profileImage = result.secure_url;
+      user.profileImage = req.file.path; // 🔥 THIS IS THE FIX
     }
 
     await user.save();
@@ -52,6 +42,7 @@ export const updateProfile = async (req, res) => {
     });
 
   } catch (err) {
+    console.error("PROFILE UPDATE ERROR:", err); // 👈 helps debugging
     return res.status(500).json({
       success: false,
       message: err.message,
